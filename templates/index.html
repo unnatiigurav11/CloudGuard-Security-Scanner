@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CloudGuard | Cloud Security</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <div class="app">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+
+            <div class="brand">
+                <div class="logo">
+                    ☁
+                    <span>✓</span>
+                </div>
+
+                <div>
+                    <h2>CloudGuard</h2>
+                    <small>Security Platform</small>
+                </div>
+            </div>
+
+            <nav>
+
+                <a href="/" class="nav-item active">
+                    <span>▣</span>
+                    Dashboard
+                </a>
+
+                <a href="/security-scan" class="nav-item">
+                    <span>◈</span>
+                    Security Scan
+                </a>
+
+               <a href="/report" class="nav-item">
+    <span>▤</span>
+    Reports
+</a>
+
+            </nav>
+
+            <div class="sidebar-bottom">
+
+                <div class="system-status">
+                    <span class="status-dot"></span>
+                    Scanner Online
+                </div>
+
+                <small>CloudGuard V1.0</small>
+
+            </div>
+
+        </aside>
+
+
+        <!-- MAIN CONTENT -->
+        <main class="main">
+
+            <!-- TOP BAR -->
+            <header class="topbar">
+
+                <div>
+                    <h1>Security Dashboard</h1>
+                    <p>Cloud Security Posture Management</p>
+                </div>
+
+                <button class="scan-btn">
+                    🔍 Run Security Scan
+                </button>
+
+            </header>
+
+
+            <!-- SECURITY OVERVIEW -->
+            <section class="overview">
+
+                <!-- SECURITY SCORE -->
+
+                <div class="score-card">
+
+                    <div>
+
+                        <p class="card-label">
+                            OVERALL SECURITY SCORE
+                        </p>
+
+                        <div class="score">
+
+                            {{ security_score }}
+
+                            <span>/100</span>
+
+                        </div>
+
+                        <p class="score-warning">
+                            ⚠ Security improvements required
+                        </p>
+
+                    </div>
+
+                    <div class="score-circle">
+
+                        <div>
+                            {{ security_score }}%
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- CRITICAL -->
+
+                <div class="severity-card critical">
+
+                    <span class="severity-icon">
+                        🔴
+                    </span>
+
+                    <div>
+
+                        <p>Critical</p>
+
+                        <strong>
+                            {{ critical }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- HIGH -->
+
+                <div class="severity-card high">
+
+                    <span class="severity-icon">
+                        🟠
+                    </span>
+
+                    <div>
+
+                        <p>High</p>
+
+                        <strong>
+                            {{ high }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- MEDIUM -->
+
+                <div class="severity-card medium">
+
+                    <span class="severity-icon">
+                        🟡
+                    </span>
+
+                    <div>
+
+                        <p>Medium</p>
+
+                        <strong>
+                            {{ medium }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- LOW -->
+
+                <div class="severity-card low">
+
+                    <span class="severity-icon">
+                        🟢
+                    </span>
+
+                    <div>
+
+                        <p>Low</p>
+
+                        <strong>
+                            {{ low }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- ================================================= -->
+            <!-- CLOUD RESOURCES -->
+            <!-- ================================================= -->
+
+            <section class="panel resources-panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <h2>
+                            Cloud Resources
+                        </h2>
+
+                        <p>
+                            Security status of monitored cloud resources
+                        </p>
+
+                    </div>
+
+                    <span class="finding-count">
+
+                        {{ resources|length }}
+
+                        Resources
+
+                    </span>
+
+                </div>
+
+
+                <div class="resources-grid">
+
+                    {% for resource in resources %}
+
+                    <div class="resource-card">
+
+                        <div class="resource-top">
+
+                            <div class="resource-icon">
+
+                                {% if resource.type == "server" %}
+
+                                🖥️
+
+                                {% elif resource.type == "storage" %}
+
+                                📦
+
+                                {% elif resource.type == "database" %}
+
+                                🗄️
+
+                                {% else %}
+
+                                ☁️
+
+                                {% endif %}
+
+                            </div>
+
+
+                            {% if resource.status == "SECURE" %}
+
+                            <span class="resource-status secure">
+
+                                ● SECURE
+
+                            </span>
+
+                            {% else %}
+
+                            <span class="resource-status risk">
+
+                                ● AT RISK
+
+                            </span>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <h3>
+                            {{ resource.name }}
+                        </h3>
+
+
+                        <p class="resource-type">
+
+                            {{ resource.type|upper }}
+
+                        </p>
+
+                    </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </section>
+
+
+
+            <!-- ================================================= -->
+            <!-- SECURITY ANALYTICS -->
+            <!-- ================================================= -->
+
+            <section class="analytics">
+
+
+                <!-- FINDINGS BY SEVERITY -->
+
+                <div class="panel chart-panel">
+
+                    <div class="panel-header">
+
+                        <div>
+
+                            <h2>
+                                Findings by Severity
+                            </h2>
+
+                            <p>
+                                Distribution of detected security issues
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="chart-container">
+
+                        <canvas id="severityChart"></canvas>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- RESOURCE SECURITY -->
+
+                <div class="panel chart-panel">
+
+                    <div class="panel-header">
+
+                        <div>
+
+                            <h2>
+                                Resource Security
+                            </h2>
+
+                            <p>
+                                Secure vs at-risk resources
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="chart-container">
+
+                        <canvas id="resourceChart"></canvas>
+
+                    </div>
+
+                </div>
+
+
+            </section>
+
+
+
+            <!-- ================================================= -->
+            <!-- SECURITY FINDINGS -->
+            <!-- ================================================= -->
+
+            <section class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <h2>
+                            Security Findings
+                        </h2>
+
+                        <p>
+                            Detected cloud security issues
+                        </p>
+
+                    </div>
+
+
+                    <span class="finding-count">
+
+                        {{ findings|length }}
+
+                        Findings
+
+                    </span>
+
+                </div>
+
+
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Resource
+                                </th>
+
+                                <th>
+                                    Security Issue
+                                </th>
+
+                                <th>
+                                    Severity
+                                </th>
+
+                                <th>
+                                    Description
+                                </th>
+
+                                <th>
+                                    Details
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            {% for finding in findings %}
+
+                            <tr>
+
+
+                                <!-- RESOURCE -->
+
+                                <td>
+
+                                    <strong>
+
+                                        {{ finding.resource }}
+
+                                    </strong>
+
+                                </td>
+
+
+
+                                <!-- ISSUE -->
+
+                                <td>
+
+                                    {{ finding.issue }}
+
+                                </td>
+
+
+
+                                <!-- SEVERITY -->
+
+                                <td>
+
+                                    {% if finding.severity == "CRITICAL" %}
+
+                                    <span class="badge critical-badge">
+
+                                        CRITICAL
+
+                                    </span>
+
+
+                                    {% elif finding.severity == "HIGH" %}
+
+                                    <span class="badge high-badge">
+
+                                        HIGH
+
+                                    </span>
+
+
+                                    {% elif finding.severity == "MEDIUM" %}
+
+                                    <span class="badge medium-badge">
+
+                                        MEDIUM
+
+                                    </span>
+
+
+                                    {% else %}
+
+                                    <span class="badge low-badge">
+
+                                        LOW
+
+                                    </span>
+
+                                    {% endif %}
+
+                                </td>
+
+
+
+                                <!-- DESCRIPTION -->
+
+                                <td class="description">
+
+                                    {{ finding.description }}
+
+                                </td>
+
+
+
+                                <!-- DETAILS BUTTON -->
+
+                                <td>
+
+                                    <button
+                                        class="details-btn"
+                                        data-finding-index="{{ loop.index0 }}">
+
+                                        View Details
+
+                                    </button>
+
+                                </td>
+
+
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- ================================================= -->
+            <!-- FOOTER -->
+            <!-- ================================================= -->
+
+            <footer>
+
+                CloudGuard • Cloud Security Posture Management
+
+                <span>•</span>
+
+                Development Version
+
+            </footer>
+
+
+        </main>
+
+    </div>
+
+
+
+    <!-- ================================================= -->
+    <!-- FINDING DETAILS MODAL -->
+    <!-- ================================================= -->
+
+    <div id="findingModal" class="modal">
+
+        <div class="modal-content">
+
+
+            <!-- CLOSE -->
+
+            <button
+                class="modal-close"
+                onclick="closeFindingDetails()">
+
+                ×
+
+            </button>
+
+
+
+            <!-- TITLE -->
+
+            <div class="modal-title">
+
+                <span>
+                    🔐
+                </span>
+
+                <h2 id="modalIssue">
+
+                    Security Finding
+
+                </h2>
+
+            </div>
+
+
+
+            <!-- RESOURCE -->
+
+            <div class="modal-resource">
+
+                Resource:
+
+                <strong id="modalResource"></strong>
+
+            </div>
+
+
+
+            <!-- SEVERITY -->
+
+            <div class="modal-severity">
+
+                Severity:
+
+                <span id="modalSeverity"></span>
+
+            </div>
+
+
+
+            <!-- DESCRIPTION -->
+
+            <div class="detail-section">
+
+                <h3>
+                    What was detected?
+                </h3>
+
+                <p id="modalDescription"></p>
+
+            </div>
+
+
+
+            <!-- RECOMMENDATION -->
+
+            <div class="detail-section">
+
+                <h3>
+                    Recommended remediation
+                </h3>
+
+                <p id="modalRecommendation"></p>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ================================================= -->
+    <!-- JAVASCRIPT -->
+    <!-- ================================================= -->
+
+    <!-- Chart.js MUST load before script.js -->
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+
+
+    <!-- CloudGuard JavaScript -->
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+
+</body>
+
+</html>

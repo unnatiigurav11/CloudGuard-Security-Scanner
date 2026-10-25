@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>CloudGuard | Security Findings</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #070d18;
+            color: #e8eef7;
+        }
+
+        /* ==========================================
+           LAYOUT
+        ========================================== */
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+
+        /* ==========================================
+           SIDEBAR
+        ========================================== */
+
+        .sidebar {
+            width: 250px;
+            background: #0a1221;
+            border-right: 1px solid #1d2d45;
+            padding: 24px 18px;
+            flex-shrink: 0;
+        }
+
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 35px;
+        }
+
+
+        .brand-icon {
+            width: 44px;
+            height: 44px;
+            border: 1px solid #2875d8;
+            background: #112544;
+            border-radius: 10px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 22px;
+        }
+
+
+        .brand-text {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+
+        .brand-subtitle {
+            color: #6982a4;
+            font-size: 11px;
+            margin-top: 4px;
+        }
+
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            padding: 13px 14px;
+            margin-bottom: 8px;
+
+            border-radius: 9px;
+
+            color: #91a4c1;
+            text-decoration: none;
+
+            font-size: 14px;
+        }
+
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: #163252;
+            color: #79b5f5;
+        }
+
+
+        .nav-icon {
+            width: 18px;
+            text-align: center;
+        }
+
+
+        /* ==========================================
+           MAIN
+        ========================================== */
+
+        .main {
+            flex: 1;
+            padding: 30px 35px;
+            overflow-x: auto;
+        }
+
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            margin-bottom: 25px;
+        }
+
+
+        .page-header h1 {
+            margin: 0;
+            font-size: 29px;
+        }
+
+
+        .page-header p {
+            color: #7890b0;
+            margin: 8px 0 0;
+            font-size: 14px;
+        }
+
+
+        .dashboard-btn {
+            display: inline-block;
+
+            background: #142a45;
+            color: #79b5f5;
+
+            border: 1px solid #28558c;
+
+            padding: 11px 17px;
+
+            border-radius: 7px;
+
+            text-decoration: none;
+
+            font-weight: 600;
+        }
+
+
+        /* ==========================================
+           FINDINGS CONTAINER
+        ========================================== */
+
+        .findings-card {
+            background: #0c1525;
+
+            border: 1px solid #1d304b;
+
+            border-radius: 10px;
+
+            overflow: hidden;
+        }
+
+
+        .findings-header {
+            padding: 24px 28px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            border-bottom: 1px solid #1d304b;
+        }
+
+
+        .findings-header h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+
+        .findings-header p {
+            margin: 7px 0 0;
+
+            color: #7890b0;
+
+            font-size: 13px;
+        }
+
+
+        .finding-count {
+            color: #91a6c2;
+            font-size: 13px;
+        }
+
+
+        /* ==========================================
+           TABLE
+        ========================================== */
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+
+            min-width: 1050px;
+        }
+
+
+        thead {
+            background: #09111f;
+        }
+
+
+        th {
+            padding: 16px 24px;
+
+            text-align: left;
+
+            color: #7590b2;
+
+            font-size: 12px;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.4px;
+
+            border-bottom: 1px solid #1d304b;
+        }
+
+
+        td {
+            padding: 18px 24px;
+
+            color: #c7d2e1;
+
+            font-size: 14px;
+
+            border-bottom: 1px solid #1a2a42;
+
+            vertical-align: middle;
+        }
+
+
+        tbody tr:hover {
+            background: #0f1b2e;
+        }
+
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+
+        /* ==========================================
+           RESOURCE
+        ========================================== */
+
+        .resource-name {
+            color: #f0f4fa;
+            font-weight: bold;
+        }
+
+
+        /* ==========================================
+           POLICY
+        ========================================== */
+
+        .policy {
+            color: #8eabd0;
+        }
+
+
+        /* ==========================================
+           SEVERITY
+        ========================================== */
+
+        .severity-badge {
+            display: inline-block;
+
+            padding: 6px 10px;
+
+            border-radius: 5px;
+
+            font-size: 11px;
+
+            font-weight: bold;
+        }
+
+
+        .severity-badge.critical {
+            background: rgba(255, 82, 105, 0.16);
+            color: #ff6377;
+        }
+
+
+        .severity-badge.high {
+            background: rgba(255, 145, 57, 0.16);
+            color: #ff9b45;
+        }
+
+
+        .severity-badge.medium {
+            background: rgba(255, 205, 73, 0.16);
+            color: #ffd052;
+        }
+
+
+        .severity-badge.low {
+            background: rgba(65, 151, 230, 0.16);
+            color: #70b8f5;
+        }
+
+
+        /* ==========================================
+           DESCRIPTION
+        ========================================== */
+
+        .description {
+            color: #8fa6c5;
+            line-height: 1.5;
+        }
+
+
+        /* ==========================================
+           VIEW DETAILS
+        ========================================== */
+
+        .details-btn {
+            background: #102642;
+
+            border: 1px solid #285d94;
+
+            color: #6fb2fa;
+
+            padding: 9px 14px;
+
+            border-radius: 7px;
+
+            cursor: pointer;
+
+            font-size: 12px;
+
+            font-weight: 600;
+        }
+
+
+        .details-btn:hover {
+            background: #173555;
+        }
+
+
+        /* ==========================================
+           MODAL
+        ========================================== */
+
+        .modal {
+            position: fixed;
+
+            inset: 0;
+
+            background: rgba(0, 0, 0, 0.72);
+
+            display: none;
+
+            align-items: center;
+            justify-content: center;
+
+            padding: 20px;
+
+            z-index: 1000;
+        }
+
+
+        .modal.show {
+            display: flex;
+        }
+
+
+        .modal-content {
+            width: min(650px, 100%);
+
+            background: #101d31;
+
+            border: 1px solid #28415f;
+
+            border-radius: 10px;
+
+            padding: 26px;
+
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.45);
+        }
+
+
+        .modal-header {
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 20px;
+        }
+
+
+        .modal-header h2 {
+            margin: 0;
+
+            font-size: 21px;
+        }
+
+
+        .close-btn {
+            border: none;
+
+            background: transparent;
+
+            color: #91a4bd;
+
+            font-size: 25px;
+
+            cursor: pointer;
+        }
+
+
+        .detail-row {
+            margin-bottom: 18px;
+        }
+
+
+        .detail-label {
+            color: #7089aa;
+
+            font-size: 12px;
+
+            text-transform: uppercase;
+
+            margin-bottom: 6px;
+        }
+
+
+        .detail-value {
+            color: #e6edf6;
+
+            line-height: 1.5;
+
+            font-size: 14px;
+        }
+
+
+        .recommendation-box {
+            margin-top: 22px;
+
+            padding: 16px;
+
+            background: #0b1728;
+
+            border: 1px solid #203b5d;
+
+            border-radius: 8px;
+        }
+
+
+        .recommendation-box .detail-label {
+            color: #79b5f5;
+        }
+
+
+        /* ==========================================
+           FOOTER
+        ========================================== */
+
+        footer {
+            text-align: center;
+
+            color: #506582;
+
+            font-size: 12px;
+
+            padding: 25px 0;
+        }
+
+
+        /* ==========================================
+           RESPONSIVE
+        ========================================== */
+
+        @media (max-width: 800px) {
+
+            .container {
+                display: block;
+            }
+
+
+            .sidebar {
+                width: 100%;
+
+                border-right: none;
+
+                border-bottom: 1px solid #1d2d45;
+            }
+
+
+            .main {
+                padding: 22px;
+            }
+
+
+            .page-header {
+                align-items: flex-start;
+
+                flex-direction: column;
+
+                gap: 18px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- ==========================================
+         SIDEBAR
+    ========================================== -->
+
+    <aside class="sidebar">
+
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                ☁
+            </div>
+
+
+            <div>
+
+                <div class="brand-text">
+                    CloudGuard
+                </div>
+
+                <div class="brand-subtitle">
+                    Security Platform
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <a href="/v2"
+           class="nav-item">
+
+            <span class="nav-icon">
+                ▣
+            </span>
+
+            Dashboard
+
+        </a>
+
+
+        <a href="/v2/security-scan"
+           class="nav-item">
+
+            <span class="nav-icon">
+                ◈
+            </span>
+
+            Security Scan
+
+        </a>
+
+
+        <a href="/v2/findings"
+           class="nav-item active">
+
+            <span class="nav-icon">
+                ⚠
+            </span>
+
+            Security Findings
+
+        </a>
+
+
+        <a href="/v2/resources"
+           class="nav-item">
+
+            <span class="nav-icon">
+                ☁
+            </span>
+
+            Resources
+
+        </a>
+
+
+        <a href="/report"
+           class="nav-item">
+
+            <span class="nav-icon">
+                ▤
+            </span>
+
+            Reports
+
+        </a>
+
+
+    </aside>
+
+
+    <!-- ==========================================
+         MAIN
+    ========================================== -->
+
+    <main class="main">
+
+
+        <div class="page-header">
+
+
+            <div>
+
+                <h1>
+                    Security Findings
+                </h1>
+
+                <p>
+                    Cloud security issues detected by
+                    CloudGuard policy checks
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- ======================================
+             FINDINGS TABLE
+        ======================================= -->
+
+        <section class="findings-card">
+
+
+            <div class="findings-header">
+
+
+                <div>
+
+                    <h2>
+                        Security Findings
+                    </h2>
+
+                    <p>
+                        Detected cloud security issues
+                    </p>
+
+                </div>
+
+
+                <div
+                    id="findingCount"
+                    class="finding-count">
+
+                    {{ findings|length }}
+                    Findings
+
+                </div>
+
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+
+                <table>
+
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Resource
+                            </th>
+
+                            <th>
+                                Security Issue
+                            </th>
+
+                            <th>
+                                Policy
+                            </th>
+
+                            <th>
+                                Severity
+                            </th>
+
+                            <th>
+                                Description
+                            </th>
+
+                            <th>
+                                Details
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+
+                        {% for finding in findings %}
+
+                        <tr>
+
+
+                            <td>
+
+                                <div class="resource-name">
+                                    {{ finding.resource }}
+                                </div>
+
+                            </td>
+
+
+                            <td>
+
+                                {{ finding.issue }}
+
+                            </td>
+
+
+                            <td>
+
+                                <div class="policy">
+                                    {{ finding.policy }}
+                                </div>
+
+                            </td>
+
+
+                            <td>
+
+                                <span
+                                    class="severity-badge {{ finding.severity|lower }}">
+
+                                    {{ finding.severity }}
+
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <div class="description">
+                                    {{ finding.description }}
+                                </div>
+
+                            </td>
+
+
+                            <td>
+
+                             <button
+    class="details-btn"
+    data-finding-index="{{ loop.index0 }}">
+
+    View Details
+
+</button>
+
+                            </td>
+
+
+                        </tr>
+
+                        {% endfor %}
+
+
+                        {% if not findings %}
+
+                        <tr>
+
+                            <td
+                                colspan="6"
+                                style="text-align:center; color:#7890b0;">
+
+                                No security findings detected.
+
+                            </td>
+
+                        </tr>
+
+                        {% endif %}
+
+
+                    </tbody>
+
+
+                </table>
+
+
+            </div>
+
+
+        </section>
+
+
+        <footer>
+
+            CloudGuard • Cloud Security Posture Management
+            &nbsp; • &nbsp;
+            V2 Security Engine
+
+        </footer>
+
+
+    </main>
+
+
+</div>
+
+
+<!-- ==========================================
+     FINDING DETAILS MODAL
+========================================== -->
+
+<div
+    id="findingModal"
+    class="modal">
+
+
+    <div class="modal-content">
+
+
+        <div class="modal-header">
+
+            <h2>
+                Finding Details
+            </h2>
+
+
+            <button
+                class="close-btn"
+                onclick="closeFinding()">
+
+                ×
+
+            </button>
+
+        </div>
+
+
+        <div class="detail-row">
+
+            <div class="detail-label">
+                Security Issue
+            </div>
+
+            <div
+                id="modalIssue"
+                class="detail-value">
+            </div>
+
+        </div>
+
+
+        <div class="detail-row">
+
+            <div class="detail-label">
+                Resource
+            </div>
+
+            <div
+                id="modalResource"
+                class="detail-value">
+            </div>
+
+        </div>
+
+
+        <div class="detail-row">
+
+            <div class="detail-label">
+                Policy
+            </div>
+
+            <div
+                id="modalPolicy"
+                class="detail-value">
+            </div>
+
+        </div>
+
+
+        <div class="detail-row">
+
+            <div class="detail-label">
+                Severity
+            </div>
+
+            <div
+                id="modalSeverity"
+                class="detail-value">
+            </div>
+
+        </div>
+
+
+        <div class="detail-row">
+
+            <div class="detail-label">
+                Description
+            </div>
+
+            <div
+                id="modalDescription"
+                class="detail-value">
+            </div>
+
+        </div>
+
+
+        <div class="recommendation-box">
+
+            <div class="detail-label">
+                Recommended Remediation
+            </div>
+
+            <div
+                id="modalRecommendation"
+                class="detail-value">
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<script id="findings-data" type="application/json">
+    {{ findings | tojson }}
+</script>
+
+<script>
+
+/* ==========================================
+   LOAD FINDINGS DATA
+========================================== */
+
+const findings =
+    JSON.parse(
+        document.getElementById("findings-data").textContent
+    );
+
+
+/* ==========================================
+   SETUP VIEW DETAILS BUTTONS
+========================================== */
+
+document
+    .querySelectorAll(".details-btn")
+    .forEach(function(button) {
+
+        button.addEventListener(
+            "click",
+            function() {
+
+                const index =
+                    Number(
+                        button.dataset.findingIndex
+                    );
+
+                showFinding(index);
+
+            }
+        );
+
+    });
+
+
+/* ==========================================
+   SHOW FINDING
+========================================== */
+
+function showFinding(index) {
+
+    const finding =
+        findings[index];
+
+    if (!finding) {
+        return;
+    }
+
+    document.getElementById(
+        "modalIssue"
+    ).textContent =
+        finding.issue;
+
+    document.getElementById(
+        "modalResource"
+    ).textContent =
+        finding.resource;
+
+    document.getElementById(
+        "modalPolicy"
+    ).textContent =
+        finding.policy;
+
+    document.getElementById(
+        "modalSeverity"
+    ).textContent =
+        finding.severity;
+
+    document.getElementById(
+        "modalDescription"
+    ).textContent =
+        finding.description;
+
+    document.getElementById(
+        "modalRecommendation"
+    ).textContent =
+        finding.recommendation;
+
+    document.getElementById(
+        "findingModal"
+    ).classList.add(
+        "show"
+    );
+
+}
+
+
+/* ==========================================
+   CLOSE FINDING
+========================================== */
+
+function closeFinding() {
+
+    document.getElementById(
+        "findingModal"
+    ).classList.remove(
+        "show"
+    );
+
+}
+
+
+/* ==========================================
+   CLOSE OUTSIDE CLICK
+========================================== */
+
+window.addEventListener(
+    "click",
+    function(event) {
+
+        const modal =
+            document.getElementById(
+                "findingModal"
+            );
+
+        if (
+            event.target === modal
+        ) {
+
+            closeFinding();
+
+        }
+
+    }
+);
+
+</script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,1800 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>CloudGuard | Security Dashboard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* ==========================================
+   MOST CRITICAL SECURITY ISSUES
+========================================== */
+
+.critical-issues-panel {
+    margin-top: 0;
+}
+
+.critical-issues-list {
+    padding: 0;
+}
+
+.critical-issue {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 20px 22px;
+    border-bottom: 1px solid #17263b;
+}
+
+.critical-issue:last-child {
+    border-bottom: none;
+}
+
+.critical-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    background: rgba(239, 68, 68, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 17px;
+}
+
+.critical-content {
+    flex: 1;
+}
+
+.critical-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 7px;
+}
+
+.critical-top strong {
+    font-size: 14px;
+}
+
+.critical-badge {
+    background: #401820;
+    color: #ff5b70;
+    padding: 4px 8px;
+    border-radius: 5px;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.critical-title {
+    color: #e8eef7;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.critical-description {
+    color: #7890b0;
+    font-size: 12px;
+}
+
+.no-critical {
+    padding: 22px;
+    color: #4ade80;
+    font-size: 13px;
+}
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #070d18;
+            color: #e8eef7;
+        }
+
+        /* ==========================================
+           LAYOUT
+        ========================================== */
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ==========================================
+           SIDEBAR
+        ========================================== */
+
+        .sidebar {
+            width: 250px;
+            background: #0a1221;
+            border-right: 1px solid #1d2d45;
+            padding: 24px 18px;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 35px;
+        }
+
+        .brand-icon {
+            width: 44px;
+            height: 44px;
+            border: 1px solid #2875d8;
+            background: #112544;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .brand-text {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .brand-subtitle {
+            color: #6982a4;
+            font-size: 11px;
+            margin-top: 4px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 14px;
+            margin-bottom: 8px;
+            border-radius: 9px;
+            color: #91a4c1;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: #163252;
+            color: #79b5f5;
+        }
+
+        .nav-icon {
+            width: 18px;
+            text-align: center;
+        }
+
+        /* ==========================================
+           MAIN
+        ========================================== */
+
+        .main {
+            flex: 1;
+            padding: 30px 35px;
+            overflow-x: hidden;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 28px;
+        }
+
+        .page-header h1 {
+            margin: 0;
+            font-size: 29px;
+        }
+
+        .page-header p {
+            color: #7890b0;
+            margin: 8px 0 0;
+            font-size: 14px;
+        }
+
+        /* ==========================================
+           SCAN BUTTON
+        ========================================== */
+
+        .scan-btn {
+            border: none;
+            background: #2878e5;
+            color: white;
+            padding: 15px 23px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .scan-btn:hover {
+            background: #3b89f0;
+        }
+
+        .scan-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* ==========================================
+           TOP SCORE + SEVERITY
+        ========================================== */
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1.65fr repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .summary-card {
+            background: #0c1525;
+            border: 1px solid #1d304b;
+            border-radius: 10px;
+            min-height: 170px;
+            padding: 25px;
+            position: relative;
+        }
+
+        .score-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-label {
+            color: #7590b5;
+            font-size: 12px;
+            letter-spacing: 0.4px;
+        }
+
+        .score-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .score-number {
+            font-size: 48px;
+            font-weight: bold;
+        }
+
+        .score-number span {
+            font-size: 18px;
+            color: #7188a7;
+        }
+
+        .score-message {
+            color: #ffb43b;
+            font-size: 12px;
+            margin-top: 6px;
+        }
+
+        .score-ring {
+            width: 95px;
+            height: 95px;
+            border-radius: 50%;
+            background:
+                conic-gradient(
+                    #4b91df 0%,
+                    #4b91df var(--score),
+                    #1a2940 var(--score),
+                    #1a2940 100%
+                );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .score-ring::after {
+            content: "";
+            position: absolute;
+            width: 77px;
+            height: 77px;
+            border-radius: 50%;
+            background: #0c1525;
+        }
+
+        .score-ring-text {
+            position: relative;
+            z-index: 2;
+            font-weight: bold;
+            color: #e8eef7;
+            font-size: 16px;
+        }
+
+        .severity-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-top: 2px solid;
+        }
+
+        .severity-card.critical {
+            border-top-color: #ff536d;
+        }
+
+        .severity-card.high {
+            border-top-color: #ff9639;
+        }
+
+        .severity-card.medium {
+            border-top-color: #f6c84a;
+        }
+
+        .severity-card.low {
+            border-top-color: #3fd889;
+        }
+
+        .severity-title {
+            color: #7790b2;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .severity-value {
+            font-size: 29px;
+            font-weight: bold;
+        }
+
+        .severity-value.critical {
+            color: #ff5b75;
+        }
+
+        .severity-value.high {
+            color: #ff9942;
+        }
+
+        .severity-value.medium {
+            color: #ffd052;
+        }
+
+        .severity-value.low {
+            color: #57dc95;
+        }
+
+        /* ==========================================
+           CLOUD RESOURCES
+        ========================================== */
+
+        .section-card {
+            background: #0c1525;
+            border: 1px solid #1d304b;
+            border-radius: 10px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 22px;
+            border-bottom: 1px solid #1d304b;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title {
+            margin: 0;
+            font-size: 19px;
+        }
+
+        .section-subtitle {
+            color: #6e86a6;
+            font-size: 12px;
+            margin-top: 6px;
+        }
+
+        .resource-count {
+            color: #91a6c2;
+            font-size: 13px;
+        }
+
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            padding: 20px;
+        }
+
+        .resource-card {
+            background: #080f1d;
+            border: 1px solid #1c304b;
+            border-radius: 9px;
+            padding: 18px;
+            min-height: 145px;
+            position: relative;
+        }
+
+        .resource-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 25px;
+        }
+
+        .resource-icon {
+            font-size: 25px;
+        }
+
+        .resource-status {
+            font-size: 10px;
+            font-weight: bold;
+            padding: 6px 8px;
+            border-radius: 5px;
+        }
+
+        .resource-status.risk {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ff6376;
+        }
+
+        .resource-status.secure {
+            background: rgba(34, 197, 94, 0.15);
+            color: #4ade80;
+        }
+
+        .resource-name {
+            font-size: 15px;
+            font-weight: bold;
+            margin-bottom: 7px;
+        }
+
+        .resource-type {
+            color: #7189aa;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+
+        /* ==========================================
+           CHECKS
+        ========================================== */
+
+        .checks-card {
+            padding: 22px;
+            margin-bottom: 24px;
+        }
+
+        .checks-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-top: 22px;
+        }
+
+        .check-label {
+            color: #7890b0;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .check-value {
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        .check-value.passed {
+            color: #4ade80;
+        }
+
+        .check-value.failed {
+            color: #ef4444;
+        }
+
+        /* ==========================================
+           CHARTS
+        ========================================== */
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .chart-card {
+            background: #0c1525;
+            border: 1px solid #1d304b;
+            border-radius: 10px;
+            padding: 22px;
+        }
+
+        .chart-card h3 {
+            margin: 0;
+            font-size: 17px;
+        }
+
+        .chart-card p {
+            color: #6f87a7;
+            font-size: 12px;
+            margin: 6px 0 18px;
+        }
+
+        .chart-container {
+            height: 290px;
+        }
+
+        /* ==========================================
+           RESPONSIVE
+        ========================================== */
+
+        @media (max-width: 1200px) {
+
+            .summary-grid {
+                grid-template-columns: 1.5fr repeat(2, 1fr);
+            }
+
+            .resources-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+        }
+
+        @media (max-width: 900px) {
+
+            .sidebar {
+                width: 210px;
+            }
+
+            .main {
+                padding: 25px;
+            }
+
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .score-card {
+                grid-column: span 2;
+            }
+
+            .resources-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+        @media (max-width: 650px) {
+
+            .container {
+                display: block;
+            }
+
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #1d2d45;
+            }
+
+            .main {
+                padding: 20px;
+            }
+
+            .page-header {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .score-card {
+                grid-column: span 1;
+            }
+
+            .resources-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .checks-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+
+    <!-- ==========================================
+         SIDEBAR
+    ========================================== -->
+
+    <aside class="sidebar">
+
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                ☁
+            </div>
+
+            <div>
+
+                <div class="brand-text">
+                    CloudGuard
+                </div>
+
+                <div class="brand-subtitle">
+                    Security Platform
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <a href="/v2"
+           class="nav-item active">
+
+            <span class="nav-icon">
+                ▣
+            </span>
+
+            Dashboard
+
+        </a>
+
+
+        <a href="/v2/security-scan"
+           class="nav-item">
+
+            <span class="nav-icon">
+                ◈
+            </span>
+
+            Security Scan
+
+        </a>
+
+
+        <a href="/v2/findings"
+           class="nav-item">
+
+            <span class="nav-icon">
+                ⚠
+            </span>
+
+            Security Findings
+
+        </a>
+
+
+        <a href="/v2/resources"
+           class="nav-item">
+
+            <span class="nav-icon">
+                ☁
+            </span>
+
+            Resources
+
+        </a>
+
+
+        <a href="/report"
+           class="nav-item">
+
+            <span class="nav-icon">
+                ▤
+            </span>
+
+            Reports
+
+        </a>
+
+
+    </aside>
+
+
+    <!-- ==========================================
+         MAIN
+    ========================================== -->
+
+    <main class="main">
+
+
+        <!-- ======================================
+             PAGE HEADER
+        ======================================= -->
+
+        <div class="page-header">
+
+            <div>
+
+                <h1>
+                    Security Dashboard
+                </h1>
+
+                <p>
+                    Cloud Security Posture Management
+                </p>
+
+            </div>
+
+
+            <button
+                id="scanButton"
+                class="scan-btn">
+
+                🔍 Run Security Scan
+
+            </button>
+
+        </div>
+
+
+        <!-- ======================================
+             SCORE + SEVERITY
+        ======================================= -->
+
+        <div class="summary-grid">
+
+
+            <!-- SCORE -->
+
+            <div class="summary-card score-card">
+
+                <div class="card-label">
+                    OVERALL SECURITY SCORE
+                </div>
+
+
+                <div class="score-content">
+
+                    <div>
+
+                        <div class="score-number">
+
+                            <span id="securityScore">
+                                --
+                            </span>
+
+                            <span>
+                                /100
+                            </span>
+
+                        </div>
+
+                        <div
+                            id="scoreMessage"
+                            class="score-message">
+
+                            Loading security status...
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="scoreRing"
+                        class="score-ring"
+                        style="--score: 0%;">
+
+                        <div
+                            id="scoreRingText"
+                            class="score-ring-text">
+
+                            --%
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- CRITICAL -->
+
+            <div class="summary-card severity-card critical">
+
+                <div class="severity-title">
+                    Critical
+                </div>
+
+                <div
+                    id="critical"
+                    class="severity-value critical">
+
+                    --
+
+                </div>
+
+            </div>
+
+
+            <!-- HIGH -->
+
+            <div class="summary-card severity-card high">
+
+                <div class="severity-title">
+                    High
+                </div>
+
+                <div
+                    id="high"
+                    class="severity-value high">
+
+                    --
+
+                </div>
+
+            </div>
+
+
+            <!-- MEDIUM -->
+
+            <div class="summary-card severity-card medium">
+
+                <div class="severity-title">
+                    Medium
+                </div>
+
+                <div
+                    id="medium"
+                    class="severity-value medium">
+
+                    --
+
+                </div>
+
+            </div>
+
+
+            <!-- LOW -->
+
+            <div class="summary-card severity-card low">
+
+                <div class="severity-title">
+                    Low
+                </div>
+
+                <div
+                    id="low"
+                    class="severity-value low">
+
+                    --
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- ======================================
+             SECURITY CHECKS
+        ======================================= -->
+
+        <section class="section-card checks-card">
+
+            <h2 class="section-title">
+                Security Checks
+            </h2>
+
+            <div class="section-subtitle">
+                Policy evaluation across discovered resources
+            </div>
+
+
+            <div class="checks-grid">
+
+
+                <div>
+
+                    <div class="check-label">
+                        Total Checks
+                    </div>
+
+                    <div
+                        id="totalChecks"
+                        class="check-value">
+
+                        --
+
+                    </div>
+
+                </div>
+
+
+                <div>
+
+                    <div class="check-label">
+                        Passed Checks
+                    </div>
+
+                    <div
+                        id="passedChecks"
+                        class="check-value passed">
+
+                        --
+
+                    </div>
+
+                </div>
+
+
+                <div>
+
+                    <div class="check-label">
+                        Failed Checks
+                    </div>
+
+                    <div
+                        id="failedChecks"
+                        class="check-value failed">
+
+                        --
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+        <!-- ======================================
+             CHARTS
+        ======================================= -->
+
+        <div class="charts-grid">
+
+
+            <div class="chart-card">
+
+                <h3>
+                    Findings by Severity
+                </h3>
+
+                <p>
+                    Distribution of detected security issues
+                </p>
+
+                <div class="chart-container">
+
+                    <canvas
+                        id="severityChart">
+                    </canvas>
+
+                </div>
+
+            </div>
+
+
+            <div class="chart-card">
+
+                <h3>
+                    Resource Security
+                </h3>
+
+                <p>
+                    Secure vs at-risk resources
+                </p>
+
+                <div class="chart-container">
+
+                    <canvas
+                        id="resourceChart">
+                    </canvas>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- ======================================
+             MOST CRITICAL SECURITY ISSUES
+        ======================================= -->
+
+        <section class="section-card critical-issues-panel">
+
+            <div class="section-header">
+
+                <div>
+                    <h2 class="section-title">
+                        Most Critical Security Issues
+                    </h2>
+
+                    <div class="section-subtitle">
+                        Critical findings requiring immediate attention
+                    </div>
+                </div>
+
+                <div id="criticalFindingCount" class="resource-count">
+                    --
+                </div>
+
+            </div>
+
+            <div id="criticalIssuesList" class="critical-issues-list">
+                <div class="no-critical">
+                    Loading critical security issues...
+                </div>
+            </div>
+
+        </section>
+
+
+    </main>
+
+</div>
+
+
+<script>
+
+let severityChart = null;
+let resourceChart = null;
+
+
+/* ==========================================
+   LOAD V2 DASHBOARD DATA
+========================================== */
+
+async function loadDashboardData() {
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/v2/dashboard-data"
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Failed to load dashboard data"
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "CloudGuard V2 data:",
+            data
+        );
+
+
+        updateDashboard(data);
+        createSeverityChart(data);
+
+        createResourceChart(data);
+
+
+    } catch (error) {
+
+        console.error(
+            "Dashboard error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* ==========================================
+   UPDATE DASHBOARD
+========================================== */
+
+function updateDashboard(data) {
+
+
+    const score =
+        Number(
+            data.security_score
+        );
+
+
+    document.getElementById(
+        "securityScore"
+    ).textContent =
+        score;
+
+
+    document.getElementById(
+        "scoreRingText"
+    ).textContent =
+        score + "%";
+
+
+    document.getElementById(
+        "scoreRing"
+    ).style
+      .setProperty(
+          "--score",
+          score + "%"
+      );
+
+
+    document.getElementById(
+        "critical"
+    ).textContent =
+        data.critical;
+
+
+    document.getElementById(
+        "high"
+    ).textContent =
+        data.high;
+
+
+    document.getElementById(
+        "medium"
+    ).textContent =
+        data.medium;
+
+
+    document.getElementById(
+        "low"
+    ).textContent =
+        data.low;
+
+
+    document.getElementById(
+        "totalChecks"
+    ).textContent =
+        data.total_checks;
+
+
+    document.getElementById(
+        "passedChecks"
+    ).textContent =
+        data.passed_checks;
+
+
+    document.getElementById(
+        "failedChecks"
+    ).textContent =
+        data.failed_checks;
+    updateCriticalIssues(data);
+
+
+    const message =
+        document.getElementById(
+            "scoreMessage"
+        );
+
+
+    if (score >= 80) {
+
+        message.textContent =
+            "✓ Strong security posture";
+
+        message.style.color =
+            "#4ade80";
+
+    }
+
+    else if (score >= 60) {
+
+        message.textContent =
+            "⚠ Security improvements required";
+
+        message.style.color =
+            "#ffb43b";
+
+    }
+
+    else {
+
+        message.textContent =
+            "⚠ Immediate security improvements required";
+
+        message.style.color =
+            "#ff6376";
+
+    }
+
+}
+
+
+/* ==========================================
+   MOST CRITICAL SECURITY ISSUES
+========================================== */
+
+function updateCriticalIssues(data) {
+
+    const container =
+        document.getElementById("criticalIssuesList");
+
+    const count =
+        document.getElementById("criticalFindingCount");
+
+    if (!container || !count) {
+        return;
+    }
+
+    const findings =
+        Array.isArray(data.findings)
+            ? data.findings
+            : [];
+
+    const criticalFindings =
+        findings.filter(function(finding) {
+            return finding.severity === "CRITICAL";
+        });
+
+    count.textContent =
+        criticalFindings.length + " Critical";
+
+    container.innerHTML = "";
+
+    if (criticalFindings.length === 0) {
+
+        container.innerHTML = `
+            <div class="no-critical">
+                ✓ No critical security issues detected.
+            </div>
+        `;
+
+        return;
+    }
+
+    criticalFindings.forEach(function(finding) {
+
+        const item =
+            document.createElement("div");
+
+        item.className = "critical-issue";
+
+        item.innerHTML = `
+
+            <div class="critical-icon">
+                🔴
+            </div>
+
+            <div class="critical-content">
+
+                <div class="critical-top">
+
+                    <strong>
+                        ${finding.resource || "Unknown Resource"}
+                    </strong>
+
+                    <span class="critical-badge">
+                        CRITICAL
+                    </span>
+
+                </div>
+
+                <div class="critical-title">
+                    ${finding.issue || "Security issue detected"}
+                </div>
+
+                <div class="critical-description">
+                    ${finding.description || "No description available."}
+                </div>
+
+            </div>
+        `;
+
+        container.appendChild(item);
+
+    });
+}
+
+
+/* ==========================================
+   RESOURCE ICON
+========================================== */
+
+function getResourceIcon(type) {
+
+    const resourceType =
+        String(type || "")
+            .toLowerCase();
+
+
+    if (
+        resourceType === "server"
+    ) {
+
+        return "🖥️";
+
+    }
+
+
+    if (
+        resourceType === "storage"
+    ) {
+
+        return "📦";
+
+    }
+
+
+    if (
+        resourceType === "database"
+    ) {
+
+        return "🗄️";
+
+    }
+
+
+    if (
+        resourceType === "security_group"
+    ) {
+
+        return "🛡️";
+
+    }
+
+
+    if (
+        resourceType === "iam_user"
+    ) {
+
+        return "👤";
+
+    }
+
+
+    return "☁️";
+
+}
+
+
+/* ==========================================
+   RESOURCE LOCATION
+========================================== */
+
+function getResourceLocation(resource) {
+
+    return (
+        resource.region ||
+        resource.location ||
+        "Global"
+    );
+
+}
+
+
+/* ==========================================
+   UPDATE RESOURCE CARDS
+========================================== */
+
+function updateResources(data) {
+
+    const container =
+        document.getElementById(
+            "resourcesGrid"
+        );
+
+
+    container.innerHTML = "";
+
+
+    const riskyResources =
+        new Set(
+            data.findings.map(
+                finding =>
+                    finding.resource
+            )
+        );
+
+
+    data.resources.forEach(
+        function(resource) {
+
+
+            const isRisky =
+                riskyResources.has(
+                    resource.name
+                );
+
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+
+            card.className =
+                "resource-card";
+
+
+            card.innerHTML = `
+
+                <div class="resource-top">
+
+                    <div class="resource-icon">
+                        ${getResourceIcon(resource.type)}
+                    </div>
+
+                    <div class="resource-status ${
+                        isRisky
+                            ? "risk"
+                            : "secure"
+                    }">
+
+                        • ${
+                            isRisky
+                                ? "AT RISK"
+                                : "SECURE"
+                        }
+
+                    </div>
+
+                </div>
+
+
+                <div class="resource-name">
+                    ${resource.name}
+                </div>
+
+
+                <div class="resource-type">
+                    ${resource.type}
+                    •
+                    ${getResourceLocation(resource)}
+                </div>
+
+            `;
+
+
+            container.appendChild(
+                card
+            );
+
+        }
+    );
+
+}
+
+
+/* ==========================================
+   SEVERITY CHART
+========================================== */
+
+function createSeverityChart(data) {
+
+    const canvas =
+        document.getElementById(
+            "severityChart"
+        );
+
+
+    if (!canvas) {
+        return;
+    }
+
+
+    if (severityChart) {
+
+        severityChart.destroy();
+
+    }
+
+
+    severityChart =
+        new Chart(
+            canvas,
+            {
+
+                type: "doughnut",
+
+                data: {
+
+                    labels: [
+                        "Critical",
+                        "High",
+                        "Medium",
+                        "Low"
+                    ],
+
+                    datasets: [{
+
+                        data: [
+                            data.critical,
+                            data.high,
+                            data.medium,
+                            data.low
+                        ],
+
+                        backgroundColor: [
+                            "#ff5f7e",
+                            "#ff9f40",
+                            "#ffd05a",
+                            "#38a3e0"
+                        ],
+
+                        borderColor:
+                            "#0c1525",
+
+                        borderWidth: 3
+
+                    }]
+
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    plugins: {
+
+                        legend: {
+
+                            position:
+                                "bottom",
+
+                            labels: {
+
+                                color:
+                                    "#c2cad7",
+
+                                padding: 15
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+        );
+
+}
+
+
+/* ==========================================
+   RESOURCE CHART
+========================================== */
+
+function createResourceChart(data) {
+
+    const canvas =
+        document.getElementById(
+            "resourceChart"
+        );
+
+
+    if (!canvas) {
+        return;
+    }
+
+
+    if (resourceChart) {
+
+        resourceChart.destroy();
+
+    }
+
+
+    resourceChart =
+        new Chart(
+            canvas,
+            {
+
+                type: "doughnut",
+
+                data: {
+
+                    labels: [
+                        "Secure",
+                        "At Risk"
+                    ],
+
+                    datasets: [{
+
+                        data: [
+                            data.secure_resources,
+                            data.risky_resources
+                        ],
+
+                        backgroundColor: [
+                            "#4ade80",
+                            "#ef4444"
+                        ],
+
+                        borderColor:
+                            "#0c1525",
+
+                        borderWidth: 3
+
+                    }]
+
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    plugins: {
+
+                        legend: {
+
+                            position:
+                                "bottom",
+
+                            labels: {
+
+                                color:
+                                    "#c2cad7",
+
+                                padding: 15
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+        );
+
+}
+
+
+/* ==========================================
+   RUN V2 SECURITY SCAN
+========================================== */
+
+const scanButton =
+    document.getElementById(
+        "scanButton"
+    );
+
+
+if (scanButton) {
+
+    scanButton.addEventListener(
+        "click",
+        async function() {
+
+
+            scanButton.disabled =
+                true;
+
+
+            scanButton.textContent =
+                "⏳ Scanning...";
+
+
+            try {
+
+
+                const response =
+                    await fetch(
+                        "/api/v2/scan",
+                        {
+                            method: "POST"
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Scan failed"
+                    );
+
+                }
+
+
+                updateDashboard(data);
+
+                updateResources(data);
+
+                createSeverityChart(data);
+
+                createResourceChart(data);
+
+
+                scanButton.textContent =
+                    "✅ Scan Complete";
+
+
+                setTimeout(
+                    function() {
+
+                        scanButton.disabled =
+                            false;
+
+                        scanButton.textContent =
+                            "🔍 Run Security Scan";
+
+                    },
+                    1200
+                );
+
+
+            }
+
+            catch (error) {
+
+
+                console.error(
+                    "V2 scan error:",
+                    error
+                );
+
+
+                scanButton.textContent =
+                    "❌ Scan Failed";
+
+
+                setTimeout(
+                    function() {
+
+                        scanButton.disabled =
+                            false;
+
+                        scanButton.textContent =
+                            "🔍 Run Security Scan";
+
+                    },
+                    1500
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+/* ==========================================
+   START DASHBOARD
+========================================== */
+
+loadDashboardData();
+
+</script>
+
+</body>
+
+</html>

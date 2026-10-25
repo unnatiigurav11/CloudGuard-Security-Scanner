@@ -1,0 +1,32 @@
+{
+    "resources": [
+        {
+            "name": "WebServer-01",
+            "type": "server",
+            "ssh_port": 22,
+            "ssh_allowed_ip": "0.0.0.0/0",
+            "encryption_enabled": false,
+            "logging_enabled": false
+        },
+        {
+            "name": "Storage-Bucket-01",
+            "type": "storage",
+            "public_access": true,
+            "encryption_enabled": false
+        },
+        {
+            "name": "Database-01",
+            "type": "database",
+            "public_access": true,
+            "encryption_enabled": true
+        },
+        {
+            "name": "WebServer-02",
+            "type": "server",
+            "ssh_port": 22,
+            "ssh_allowed_ip": "192.168.1.10",
+            "encryption_enabled": true,
+            "logging_enabled": true
+        }
+    ]
+}

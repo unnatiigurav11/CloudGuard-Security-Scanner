@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudGuard | Resources</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #070d18;
+            color: #f1f5f9;
+            min-height: 100vh;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            min-height: 100vh;
+            background: #0a1322;
+            border-right: 1px solid #1d304b;
+            padding: 24px 18px;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 34px;
+        }
+
+        .brand-icon {
+            width: 44px;
+            height: 44px;
+            border: 1px solid #2582ff;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #0c1c31;
+            color: #dbeafe;
+            font-size: 21px;
+        }
+
+        .brand-name {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .brand-subtitle {
+            color: #6fa4df;
+            font-size: 12px;
+            margin-top: 3px;
+        }
+
+        .nav {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: #8fb0d7;
+            padding: 14px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            font-size: 15px;
+        }
+
+        .nav a:hover {
+            background: #102640;
+            color: #e7f1ff;
+        }
+
+        .nav a.active {
+            background: #173b63;
+            color: #5ea5ff;
+        }
+
+        .nav-icon {
+            width: 17px;
+            text-align: center;
+        }
+
+        .main {
+            flex: 1;
+            padding: 24px 30px 40px;
+            overflow-x: hidden;
+        }
+
+        .resource-shell {
+            background: #0b1525;
+            border: 1px solid #203651;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .resource-header {
+            padding: 28px 30px;
+            border-bottom: 1px solid #203651;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .page-title {
+            font-size: 25px;
+            font-weight: 700;
+        }
+
+        .page-subtitle {
+            color: #6f9dd1;
+            margin-top: 7px;
+            font-size: 14px;
+        }
+
+        .resource-count {
+            color: #8fb8e8;
+            font-size: 14px;
+            padding-top: 3px;
+        }
+
+        .resources-grid {
+            padding: 25px;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(180px, 1fr));
+            gap: 18px;
+        }
+
+        .resource-card {
+            background: #0a1322;
+            border: 1px solid #203651;
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 180px;
+        }
+
+        .resource-card.risk {
+            border-color: #263d5a;
+        }
+
+        .resource-card.safe {
+            border-color: #203651;
+        }
+
+        .resource-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 35px;
+        }
+
+        .resource-icon {
+            font-size: 25px;
+            line-height: 1;
+        }
+
+        .status {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 7px 10px;
+            border-radius: 5px;
+        }
+
+        .status.safe {
+            color: #4ff0a2;
+            background: #073329;
+        }
+
+        .status.risk {
+            color: #ff5c78;
+            background: #351522;
+        }
+
+        .resource-name {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .resource-meta {
+            color: #78a8dc;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .loading,
+        .error {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading {
+            color: #f5c45c;
+        }
+
+        .error {
+            color: #ff7184;
+        }
+
+        @media (max-width: 1200px) {
+            .resources-grid {
+                grid-template-columns: repeat(3, minmax(180px, 1fr));
+            }
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                width: 210px;
+            }
+
+            .resources-grid {
+                grid-template-columns: repeat(2, minmax(180px, 1fr));
+            }
+        }
+
+        @media (max-width: 650px) {
+            .layout {
+                display: block;
+            }
+
+            .sidebar {
+                width: 100%;
+                min-height: auto;
+            }
+
+            .main {
+                padding: 15px;
+            }
+
+            .resource-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .resources-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-icon">☁</div>
+
+            <div>
+                <div class="brand-name">CloudGuard</div>
+                <div class="brand-subtitle">Security Platform</div>
+            </div>
+        </div>
+
+        <nav class="nav">
+
+            <a href="/v2">
+                <span class="nav-icon">▣</span>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/v2/security-scan">
+                <span class="nav-icon">◈</span>
+                <span>Security Scan</span>
+            </a>
+
+            <a href="/v2/findings">
+                <span class="nav-icon">⚠</span>
+                <span>Security Findings</span>
+            </a>
+
+            <a href="/v2/resources" class="active">
+                <span class="nav-icon">☁</span>
+                <span>Resources</span>
+            </a>
+
+            <a href="/report">
+                <span class="nav-icon">▤</span>
+                <span>Reports</span>
+            </a>
+
+        </nav>
+
+    </aside>
+
+    <main class="main">
+
+        <section class="resource-shell">
+
+            <div class="resource-header">
+
+                <div>
+                    <h1 class="page-title">Cloud Resources</h1>
+
+                    <p class="page-subtitle">
+                        Security status of monitored cloud resources
+                    </p>
+                </div>
+
+                <div id="resourceCount" class="resource-count">
+                    Loading...
+                </div>
+
+            </div>
+
+            <div id="resourcesGrid" class="resources-grid">
+
+                <div class="loading">
+                    Loading cloud resources...
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script>
+
+function getIcon(type) {
+
+    const icons = {
+        server: "🖥️",
+        storage: "📦",
+        database: "🗄️",
+        security_group: "🛡️",
+        iam_user: "👤"
+    };
+
+    return icons[type] || "☁️";
+}
+
+
+function getType(type) {
+
+    const names = {
+        server: "SERVER",
+        storage: "STORAGE",
+        database: "DATABASE",
+        security_group: "SECURITY GROUP",
+        iam_user: "IAM USER"
+    };
+
+    return names[type] || String(type || "RESOURCE").toUpperCase();
+}
+
+
+function getLocation(resource) {
+
+    return (
+        resource.location ||
+        resource.region ||
+        "Global"
+    ).toUpperCase();
+}
+
+
+function renderResources(data) {
+
+    const resources =
+        Array.isArray(data.resources)
+            ? data.resources
+            : [];
+
+    /*
+       The V2 API resources may not contain a status field.
+       Therefore determine risk from the V2 findings.
+
+       Any resource appearing in a finding is AT RISK.
+       Everything else is SECURE.
+    */
+
+    const findings =
+        Array.isArray(data.findings)
+            ? data.findings
+            : [];
+
+    const riskyResources =
+        new Set(
+            findings
+                .map(finding => finding.resource)
+                .filter(Boolean)
+        );
+
+
+    document.getElementById("resourceCount").textContent =
+        resources.length + " Resources";
+
+
+    const grid =
+        document.getElementById("resourcesGrid");
+
+
+    if (resources.length === 0) {
+
+        grid.innerHTML = `
+            <div class="error">
+                No cloud resources discovered.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    grid.innerHTML = resources.map(resource => {
+
+        const isRisk =
+            riskyResources.has(resource.name);
+
+        return `
+
+            <div class="resource-card ${isRisk ? "risk" : "safe"}">
+
+                <div class="resource-top">
+
+                    <div class="resource-icon">
+                        ${getIcon(resource.type)}
+                    </div>
+
+                    <span class="status ${isRisk ? "risk" : "safe"}">
+                        • ${isRisk ? "AT RISK" : "SECURE"}
+                    </span>
+
+                </div>
+
+                <div class="resource-name">
+                    ${resource.name || "Unknown Resource"}
+                </div>
+
+                <div class="resource-meta">
+                    ${getType(resource.type)}
+                    •
+                    ${getLocation(resource)}
+                </div>
+
+            </div>
+
+        `;
+
+    }).join("");
+}
+
+
+async function loadResources() {
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/v2/dashboard-data",
+                {
+                    cache: "no-store"
+                }
+            );
+
+        if (!response.ok) {
+
+            throw new Error(
+                "API returned HTTP " +
+                response.status
+            );
+
+        }
+
+        const data =
+            await response.json();
+
+        console.log(
+            "CloudGuard V2 Resources:",
+            data
+        );
+
+        renderResources(data);
+
+    } catch (error) {
+
+        console.error(
+            "CloudGuard Resources Error:",
+            error
+        );
+
+        document.getElementById(
+            "resourcesGrid"
+        ).innerHTML = `
+            <div class="error">
+                Unable to load cloud resources.
+            </div>
+        `;
+    }
+}
+
+
+document.addEventListener(
+    "DOMContentLoaded",
+    loadResources
+);
+
+</script>
+
+</body>
+</html>LOCATION

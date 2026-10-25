@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>CloudGuard | V2 Security Scan</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #070d18;
+            color: #e8eef7;
+        }
+
+        /* ==========================================
+           LAYOUT
+        ========================================== */
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ==========================================
+           SIDEBAR
+        ========================================== */
+
+        .sidebar {
+            width: 250px;
+            background: #0a1221;
+            border-right: 1px solid #1d2d45;
+            padding: 24px 18px;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 35px;
+        }
+
+        .brand-icon {
+            width: 44px;
+            height: 44px;
+            border: 1px solid #2875d8;
+            background: #112544;
+            border-radius: 10px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 22px;
+        }
+
+        .brand-text {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .brand-subtitle {
+            color: #6982a4;
+            font-size: 11px;
+            margin-top: 4px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            padding: 13px 14px;
+            margin-bottom: 8px;
+
+            border-radius: 9px;
+
+            color: #91a4c1;
+            text-decoration: none;
+
+            font-size: 14px;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: #163252;
+            color: #79b5f5;
+        }
+
+        .nav-icon {
+            width: 18px;
+            text-align: center;
+        }
+
+        /* ==========================================
+           MAIN
+        ========================================== */
+
+        .main {
+            flex: 1;
+            padding: 30px 35px;
+            overflow-x: hidden;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            margin-bottom: 25px;
+        }
+
+        .page-header h1 {
+            margin: 0;
+            font-size: 29px;
+        }
+
+        .page-header p {
+            color: #7890b0;
+            margin: 8px 0 0;
+            font-size: 14px;
+        }
+
+        .dashboard-btn {
+            display: inline-block;
+
+            background: #142a45;
+            color: #79b5f5;
+
+            border: 1px solid #28558c;
+
+            padding: 11px 17px;
+
+            border-radius: 7px;
+
+            text-decoration: none;
+
+            font-weight: 600;
+        }
+
+        /* ==========================================
+           CARDS
+        ========================================== */
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: #0c1525;
+            border: 1px solid #1d304b;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 22px;
+
+            border-bottom: 1px solid #1d304b;
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-size: 19px;
+        }
+
+        .card-header p {
+            margin: 7px 0 0;
+
+            color: #7189aa;
+            font-size: 12px;
+        }
+
+        .card-body {
+            padding: 22px;
+        }
+
+        /* ==========================================
+           SCANNER STATUS
+        ========================================== */
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            padding: 15px 0;
+
+            border-bottom: 1px solid #1a2940;
+        }
+
+        .status-row:last-child {
+            border-bottom: none;
+        }
+
+        .status-label {
+            color: #7890b0;
+            font-size: 13px;
+        }
+
+        .status-value {
+            color: #e7edf6;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .online {
+            color: #4ade80;
+        }
+
+        /* ==========================================
+           CONFIGURATION
+        ========================================== */
+
+        .config-item {
+            padding: 15px;
+
+            margin-bottom: 12px;
+
+            background: #091321;
+
+            border: 1px solid #1c304a;
+
+            border-radius: 8px;
+        }
+
+        .config-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .config-title {
+            color: #e6edf6;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .config-value {
+            color: #7890b0;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        /* ==========================================
+           SCAN ACTIVITY
+        ========================================== */
+
+        .activity-card {
+            margin-top: 20px;
+        }
+
+        .activity-list {
+            padding: 22px;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+
+            padding: 14px 0;
+
+            border-bottom: 1px solid #1a2940;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 30px;
+            height: 30px;
+
+            border-radius: 50%;
+
+            background: #122743;
+
+            color: #72b4f5;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 13px;
+        }
+
+        .activity-text {
+            color: #c4d0df;
+            font-size: 13px;
+        }
+
+        .activity-status {
+            margin-left: auto;
+
+            color: #4ade80;
+
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        /* ==========================================
+           RESULTS
+        ========================================== */
+
+        .results-card {
+            margin-top: 20px;
+        }
+
+        .results-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 15px;
+
+            padding: 22px;
+        }
+
+        .result-box {
+            background: #091321;
+
+            border: 1px solid #1c304a;
+
+            border-radius: 8px;
+
+            padding: 18px;
+        }
+
+        .result-label {
+            color: #7189aa;
+            font-size: 12px;
+        }
+
+        .result-value {
+            font-size: 27px;
+
+            font-weight: bold;
+
+            margin-top: 8px;
+        }
+
+        .score {
+            color: #70b5f4;
+        }
+
+        .passed {
+            color: #4ade80;
+        }
+
+        .failed {
+            color: #ef4444;
+        }
+
+        .findings {
+            color: #ff9b45;
+        }
+
+        /* ==========================================
+           SCAN BUTTON
+        ========================================== */
+
+        .scan-section {
+            margin-top: 20px;
+
+            display: flex;
+            justify-content: center;
+        }
+
+        .scan-btn {
+            border: none;
+
+            background: #2878e5;
+
+            color: white;
+
+            padding: 15px 28px;
+
+            border-radius: 8px;
+
+            font-weight: bold;
+
+            font-size: 14px;
+
+            cursor: pointer;
+        }
+
+        .scan-btn:hover {
+            background: #3b89f0;
+        }
+
+        .scan-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* ==========================================
+           MESSAGE
+        ========================================== */
+
+        .scan-message {
+            text-align: center;
+
+            color: #7890b0;
+
+            font-size: 13px;
+
+            margin-top: 14px;
+
+            min-height: 20px;
+        }
+
+        /* ==========================================
+           RESPONSIVE
+        ========================================== */
+
+        @media (max-width: 950px) {
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .results-grid {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+        }
+
+        @media (max-width: 700px) {
+
+            .container {
+                display: block;
+            }
+
+            .sidebar {
+                width: 100%;
+
+                border-right: none;
+
+                border-bottom: 1px solid #1d2d45;
+            }
+
+            .main {
+                padding: 22px;
+            }
+
+            .page-header {
+                flex-direction: column;
+
+                align-items: flex-start;
+
+                gap: 18px;
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- ==========================================
+         SIDEBAR
+    ========================================== -->
+
+    <aside class="sidebar">
+
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                ☁
+            </div>
+
+            <div>
+
+                <div class="brand-text">
+                    CloudGuard
+                </div>
+
+                <div class="brand-subtitle">
+                    Security Platform
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <a href="/v2"
+           class="nav-item">
+
+            <span class="nav-icon">
+                ▣
+            </span>
+
+            Dashboard
+
+        </a>
+
+
+        <a href="/v2/security-scan"
+           class="nav-item active">
+
+            <span class="nav-icon">
+                ◈
+            </span>
+
+            Security Scan
+
+        </a>
+
+
+        <a href="/v2/findings"
+           class="nav-item">
+
+            <span class="nav-icon">
+                ⚠
+            </span>
+
+            Security Findings
+
+        </a>
+
+
+        <a href="/v2/resources"
+           class="nav-item">
+
+            <span class="nav-icon">
+                ☁
+            </span>
+
+            Resources
+
+        </a>
+
+
+        <a href="/report"
+           class="nav-item">
+
+            <span class="nav-icon">
+                ▤
+            </span>
+
+            Reports
+
+        </a>
+
+
+    </aside>
+
+
+    <!-- ==========================================
+         MAIN
+    ========================================== -->
+
+    <main class="main">
+
+<div class="page-header">
+
+    <div>
+
+        <h1>
+            V2 Security Scan
+        </h1>
+
+        <p>
+            CloudGuard policy-based security scanning
+        </p>
+
+    </div>
+
+</div>
+          
+
+
+        <!-- ======================================
+             TOP INFORMATION
+        ======================================= -->
+
+        <div class="grid">
+
+
+            <!-- SCANNER STATUS -->
+
+            <section class="card">
+
+
+                <div class="card-header">
+
+                    <h2>
+                        Scanner Status
+                    </h2>
+
+                    <p>
+                        Current CloudGuard scanning engine
+                    </p>
+
+                </div>
+
+
+                <div class="card-body">
+
+
+                    <div class="status-row">
+
+                        <span class="status-label">
+                            Scanner Status
+                        </span>
+
+                        <span
+                            id="scannerStatus"
+                            class="status-value online">
+
+                            ● Online
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="status-row">
+
+                        <span class="status-label">
+                            Scan Engine
+                        </span>
+
+                        <span class="status-value">
+                            CloudGuard V2 Scanner
+                        </span>
+
+                    </div>
+
+
+                    <div class="status-row">
+
+                        <span class="status-label">
+                            Scan Type
+                        </span>
+
+                        <span class="status-value">
+                            Full Security Scan
+                        </span>
+
+                    </div>
+
+
+                    <div class="status-row">
+
+                        <span class="status-label">
+                            Target
+                        </span>
+
+                        <span class="status-value">
+                            All Cloud Resources
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+            </section>
+
+
+            <!-- SCAN CONFIGURATION -->
+
+            <section class="card">
+
+
+                <div class="card-header">
+
+                    <h2>
+                        Scan Configuration
+                    </h2>
+
+                    <p>
+                        Security policies used by V2
+                    </p>
+
+                </div>
+
+
+                <div class="card-body">
+
+
+                    <div class="config-item">
+
+                        <div class="config-title">
+                            Resource Discovery
+                        </div>
+
+                        <div class="config-value">
+                            Discover all configured cloud resources
+                        </div>
+
+                    </div>
+
+
+                    <div class="config-item">
+
+                        <div class="config-title">
+                            Policy Engine
+                        </div>
+
+                        <div class="config-value">
+                            CloudGuard V2 Policy Engine
+                        </div>
+
+                    </div>
+
+
+                    <div class="config-item">
+
+                        <div class="config-title">
+                            Security Checks
+                        </div>
+
+                        <div
+                            id="checkConfig"
+                            class="config-value">
+
+                            21 policy checks
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="config-item">
+
+                        <div class="config-title">
+                            Evaluation Mode
+                        </div>
+
+                        <div class="config-value">
+                            Configuration Based
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </section>
+
+
+        </div>
+
+
+        <!-- ======================================
+             SCAN ACTIVITY
+        ======================================= -->
+
+        <section class="card activity-card">
+
+
+            <div class="card-header">
+
+                <h2>
+                    Scan Activity
+                </h2>
+
+                <p>
+                    V2 security scan execution status
+                </p>
+
+            </div>
+
+
+            <div class="activity-list">
+
+
+                <div class="activity-item">
+
+                    <div
+                        id="activity1"
+                        class="activity-icon">
+
+                        ✓
+
+                    </div>
+
+                    <div class="activity-text">
+                        Resource discovery
+                    </div>
+
+                    <div
+                        id="status1"
+                        class="activity-status">
+
+                        READY
+
+                    </div>
+
+                </div>
+
+
+                <div class="activity-item">
+
+                    <div
+                        id="activity2"
+                        class="activity-icon">
+
+                        ✓
+
+                    </div>
+
+                    <div class="activity-text">
+                        Policy evaluation
+                    </div>
+
+                    <div
+                        id="status2"
+                        class="activity-status">
+
+                        READY
+
+                    </div>
+
+                </div>
+
+
+                <div class="activity-item">
+
+                    <div
+                        id="activity3"
+                        class="activity-icon">
+
+                        ✓
+
+                    </div>
+
+                    <div class="activity-text">
+                        Security checks
+                    </div>
+
+                    <div
+                        id="status3"
+                        class="activity-status">
+
+                        READY
+
+                    </div>
+
+                </div>
+
+
+                <div class="activity-item">
+
+                    <div
+                        id="activity4"
+                        class="activity-icon">
+
+                        ✓
+
+                    </div>
+
+                    <div class="activity-text">
+                        Findings analyzed
+                    </div>
+
+                    <div
+                        id="status4"
+                        class="activity-status">
+
+                        READY
+
+                    </div>
+
+                </div>
+
+
+                <div class="activity-item">
+
+                    <div
+                        id="activity5"
+                        class="activity-icon">
+
+                        ✓
+
+                    </div>
+
+                    <div class="activity-text">
+                        Security score calculated
+                    </div>
+
+                    <div
+                        id="status5"
+                        class="activity-status">
+
+                        READY
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+        <!-- ======================================
+             SCAN RESULTS
+        ======================================= -->
+
+        <section class="card results-card">
+
+
+            <div class="card-header">
+
+                <h2>
+                    Latest Scan Results
+                </h2>
+
+                <p>
+                    Results returned by the V2 security engine
+                </p>
+
+            </div>
+
+
+            <div class="results-grid">
+
+
+                <div class="result-box">
+
+                    <div class="result-label">
+                        Resources
+                    </div>
+
+                    <div
+                        id="totalResources"
+                        class="result-value">
+
+                        --
+
+                    </div>
+
+                </div>
+
+
+                <div class="result-box">
+
+                    <div class="result-label">
+                        Security Score
+                    </div>
+
+                    <div
+                        id="securityScore"
+                        class="result-value score">
+
+                        --
+
+                    </div>
+
+                </div>
+
+
+                <div class="result-box">
+
+                    <div class="result-label">
+                        Passed Checks
+                    </div>
+
+                    <div
+                        id="passedChecks"
+                        class="result-value passed">
+
+                        --
+
+                    </div>
+
+                </div>
+
+
+                <div class="result-box">
+
+                    <div class="result-label">
+                        Failed Checks
+                    </div>
+
+                    <div
+                        id="failedChecks"
+                        class="result-value failed">
+
+                        --
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+        <!-- ======================================
+             SCAN BUTTON
+        ======================================= -->
+
+        <div class="scan-section">
+
+            <button
+                id="startScan"
+                class="scan-btn">
+
+                🔍 Start New Security Scan
+
+            </button>
+
+        </div>
+
+
+        <div
+            id="scanMessage"
+            class="scan-message">
+
+            Ready to scan the simulated cloud environment.
+
+        </div>
+
+
+    </main>
+
+
+</div>
+
+
+<script>
+
+
+/* ==========================================
+   UPDATE SCAN ACTIVITY
+========================================== */
+
+function updateActivity(running) {
+
+    const statuses = [
+        "status1",
+        "status2",
+        "status3",
+        "status4",
+        "status5"
+    ];
+
+
+    statuses.forEach(
+        function(id) {
+
+            const element =
+                document.getElementById(id);
+
+            if (running) {
+
+                element.textContent =
+                    "SCANNING";
+
+                element.style.color =
+                    "#ffb43b";
+
+            }
+
+            else {
+
+                element.textContent =
+                    "COMPLETED";
+
+                element.style.color =
+                    "#4ade80";
+
+            }
+
+        }
+    );
+
+}
+
+
+/* ==========================================
+   UPDATE RESULTS
+========================================== */
+
+function updateResults(data) {
+
+
+    document.getElementById(
+        "totalResources"
+    ).textContent =
+        data.total_resources;
+
+
+    document.getElementById(
+        "securityScore"
+    ).textContent =
+        data.security_score + "/100";
+
+
+    document.getElementById(
+        "passedChecks"
+    ).textContent =
+        data.passed_checks;
+
+
+    document.getElementById(
+        "failedChecks"
+    ).textContent =
+        data.failed_checks;
+
+
+    document.getElementById(
+        "checkConfig"
+    ).textContent =
+        data.total_checks +
+        " policy checks";
+
+}
+
+
+/* ==========================================
+   LOAD CURRENT RESULTS
+========================================== */
+
+async function loadCurrentResults() {
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/v2/dashboard-data"
+            );
+
+        if (!response.ok) {
+            throw new Error(
+                "Unable to load scan data"
+            );
+        }
+
+        const data =
+            await response.json();
+
+        updateResults(data);
+
+        // Do NOT mark scan as completed here.
+        // This is only loading the latest saved/current results.
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Load scan data error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* ==========================================
+   START SCAN
+========================================== */
+
+const startButton =
+    document.getElementById(
+        "startScan"
+    );
+
+
+if (startButton) {
+
+    startButton.addEventListener(
+        "click",
+        async function() {
+
+            startButton.disabled = true;
+
+            startButton.textContent =
+                "⏳ Scanning...";
+
+
+            document.getElementById(
+                "scanMessage"
+            ).textContent =
+                "CloudGuard V2 is scanning the cloud environment...";
+
+
+            updateActivity(true);
+
+
+            try {
+
+                /*
+                 * Run the REAL V2 scan API.
+                 */
+
+                const response =
+                    await fetch(
+                        "/api/v2/scan",
+                        {
+                            method: "POST"
+                        }
+                    );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "V2 scan failed"
+                    );
+
+                }
+
+
+                const data =
+                    await response.json();
+
+
+                /*
+                 * Update the dashboard
+                 * with the actual scan result.
+                 */
+
+                updateResults(data);
+
+
+                /*
+                 * Show completed state
+                 * only AFTER the API responds.
+                 */
+
+                updateActivity(false);
+
+
+                document.getElementById(
+                    "scanMessage"
+                ).textContent =
+                    "✓ Security scan completed successfully.";
+
+
+                startButton.textContent =
+                    "✅ Scan Complete";
+
+
+                setTimeout(
+                    function() {
+
+                        startButton.disabled =
+                            false;
+
+                        startButton.textContent =
+                            "🔍 Start New Security Scan";
+
+                    },
+                    1500
+                );
+
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "V2 scan error:",
+                    error
+                );
+
+
+                document.getElementById(
+                    "scanMessage"
+                ).textContent =
+                    "❌ Scan failed. Check the Flask terminal for errors.";
+
+
+                startButton.textContent =
+                    "❌ Scan Failed";
+
+
+                setTimeout(
+                    function() {
+
+                        startButton.disabled =
+                            false;
+
+                        startButton.textContent =
+                            "🔍 Start New Security Scan";
+
+                    },
+                    1500
+                );
+
+            }
+
+        }
+    );
+
+}
+
+/* ==========================================
+   START PAGE
+========================================== */
+
+loadCurrentResults();
+
+</script>
+
+
+</body>
+
+</html>

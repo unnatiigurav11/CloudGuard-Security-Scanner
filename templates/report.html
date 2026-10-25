@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>CloudGuard | Security Report</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+
+            margin: 0;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background: #070d18;
+
+            color: #e8eef7;
+
+        }
+
+
+        .report-container {
+
+            max-width: 1100px;
+
+            margin: 40px auto;
+
+            padding: 0 25px 50px;
+
+        }
+
+
+        /* HEADER */
+
+        .report-header {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            padding-bottom: 25px;
+
+            border-bottom: 1px solid #263650;
+
+        }
+
+
+        .brand {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 15px;
+
+        }
+
+
+        .logo {
+
+            width: 52px;
+
+            height: 52px;
+
+            border-radius: 12px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background: #102744;
+
+            border: 1px solid #2877c9;
+
+            font-size: 26px;
+
+        }
+
+
+        .brand h1 {
+
+            margin: 0;
+
+            font-size: 25px;
+
+        }
+
+
+        .brand p {
+
+            margin: 5px 0 0;
+
+            color: #7186a5;
+
+            font-size: 13px;
+
+        }
+
+
+        .report-title {
+
+            margin-top: 35px;
+
+        }
+
+
+        .report-title h2 {
+
+            margin: 0;
+
+            font-size: 30px;
+
+        }
+
+
+        .report-title p {
+
+            color: #7186a5;
+
+            margin-top: 8px;
+
+        }
+
+
+        /* BUTTONS */
+
+        .actions {
+
+            display: flex;
+
+            gap: 10px;
+
+        }
+
+
+        button {
+
+            border: none;
+
+            border-radius: 7px;
+
+            padding: 11px 17px;
+
+            cursor: pointer;
+
+            font-weight: 600;
+
+        }
+
+
+        .dashboard-btn {
+
+            display: inline-block;
+
+            background: #142a45;
+
+            color: #79b5f5;
+
+            border: 1px solid #28558c;
+
+            padding: 11px 17px;
+
+            border-radius: 7px;
+
+            text-decoration: none;
+
+            font-weight: 600;
+
+        }
+
+
+        .dashboard-btn:hover {
+
+            opacity: 0.88;
+
+        }
+
+
+        .print-btn {
+
+            background: #1976d2;
+
+            color: white;
+
+        }
+
+
+        button:hover {
+
+            opacity: 0.88;
+
+        }
+
+
+        /* SCORE */
+
+        .summary-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                1.4fr
+                1fr
+                1fr
+                1fr;
+
+            gap: 15px;
+
+            margin-top: 30px;
+
+        }
+
+
+        .summary-card {
+
+            background: #0d1524;
+
+            border: 1px solid #223552;
+
+            border-radius: 12px;
+
+            padding: 22px;
+
+        }
+
+
+        .summary-card p {
+
+            margin: 0 0 10px;
+
+            color: #7186a5;
+
+            font-size: 12px;
+
+            text-transform: uppercase;
+
+        }
+
+
+        .summary-card strong {
+
+            font-size: 30px;
+
+        }
+
+
+        .score-card {
+
+            border-left: 4px solid #ef4444;
+
+        }
+
+
+        .score-card strong {
+
+            color: #ff6262;
+
+        }
+
+
+        .critical {
+
+            color: #ff5b70;
+
+        }
+
+
+        .high {
+
+            color: #ff9a52;
+
+        }
+
+
+        .medium {
+
+            color: #ffd05a;
+
+        }
+
+
+        .low {
+
+            color: #58db91;
+
+        }
+
+
+        /* SECTION */
+
+        .section {
+
+            margin-top: 30px;
+
+            background: #0d1524;
+
+            border: 1px solid #223552;
+
+            border-radius: 12px;
+
+            overflow: hidden;
+
+        }
+
+
+        .section-header {
+
+            padding: 20px 22px;
+
+            border-bottom: 1px solid #223552;
+
+        }
+
+
+        .section-header h2 {
+
+            margin: 0;
+
+            font-size: 19px;
+
+        }
+
+
+        .section-header p {
+
+            margin: 6px 0 0;
+
+            color: #7186a5;
+
+            font-size: 13px;
+
+        }
+
+
+        .section-body {
+
+            padding: 22px;
+
+        }
+
+
+        /* RESOURCE SUMMARY */
+
+        .resources {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 15px;
+
+        }
+
+
+        .resource {
+
+            padding: 18px;
+
+            border-radius: 9px;
+
+            background: #09111f;
+
+            border: 1px solid #1d2d46;
+
+        }
+
+
+        .resource-name {
+
+            font-weight: 700;
+
+            margin-bottom: 8px;
+
+        }
+
+
+        .resource-type {
+
+            color: #7186a5;
+
+            font-size: 11px;
+
+        }
+
+
+        .resource-status {
+
+            margin-top: 14px;
+
+            font-size: 10px;
+
+            font-weight: 700;
+
+        }
+
+
+        .secure {
+
+            color: #58db91;
+
+        }
+
+
+        .risk {
+
+            color: #ff6262;
+
+        }
+
+
+        /* FINDINGS */
+
+        .finding {
+
+            padding: 20px;
+
+            margin-bottom: 15px;
+
+            background: #09111f;
+
+            border: 1px solid #1d2d46;
+
+            border-radius: 9px;
+
+        }
+
+
+        .finding:last-child {
+
+            margin-bottom: 0;
+
+        }
+
+
+        .finding-top {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 15px;
+
+        }
+
+
+        .finding-title {
+
+            font-size: 16px;
+
+            font-weight: 700;
+
+        }
+
+
+        .badge {
+
+            padding: 5px 9px;
+
+            border-radius: 5px;
+
+            font-size: 9px;
+
+            font-weight: 700;
+
+        }
+
+
+        .badge-critical {
+
+            background: #481d29;
+
+            color: #ff6677;
+
+        }
+
+
+        .badge-high {
+
+            background: #4a2b18;
+
+            color: #ffac61;
+
+        }
+
+
+        .badge-medium {
+
+            background: #443a18;
+
+            color: #f5d65e;
+
+        }
+
+
+        .badge-low {
+
+            background: #173b28;
+
+            color: #65df98;
+
+        }
+
+
+        .finding-resource {
+
+            margin-top: 9px;
+
+            color: #79b5f5;
+
+            font-size: 12px;
+
+        }
+
+
+        .finding-description {
+
+            margin-top: 15px;
+
+            color: #b8c3d3;
+
+            font-size: 13px;
+
+            line-height: 1.6;
+
+        }
+
+
+        .recommendation {
+
+            margin-top: 15px;
+
+            padding: 13px;
+
+            background: #0e1c2e;
+
+            border-left: 3px solid #368fe3;
+
+            color: #c8d2df;
+
+            font-size: 12px;
+
+        }
+
+
+        .recommendation strong {
+
+            color: #72b4f5;
+
+        }
+
+
+        /* FOOTER */
+
+        footer {
+
+            text-align: center;
+
+            margin-top: 35px;
+
+            color: #536681;
+
+            font-size: 11px;
+
+        }
+
+
+        /* PRINT */
+
+        @media print {
+
+            body {
+
+                background: white;
+
+                color: black;
+
+            }
+
+
+            .report-container {
+
+                margin: 0;
+
+                max-width: none;
+
+            }
+
+
+            .actions {
+
+                display: none;
+
+            }
+
+
+            .summary-card,
+            .section,
+            .finding {
+
+                color: black;
+
+                background: white;
+
+                border-color: #cccccc;
+
+            }
+
+
+            .section-header {
+
+                border-color: #cccccc;
+
+            }
+
+
+            .finding-description,
+            .recommendation {
+
+                color: #333;
+
+            }
+
+        }
+
+
+        @media (max-width: 800px) {
+
+            .summary-grid {
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+
+            }
+
+
+            .resources {
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+
+            }
+
+
+            .report-header {
+
+                flex-direction: column;
+
+                align-items: flex-start;
+
+                gap: 20px;
+
+            }
+
+        }
+
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="report-container">
+
+
+    <!-- HEADER -->
+
+    <header class="report-header">
+
+        <div class="brand">
+
+            <div class="logo">
+                ☁️
+            </div>
+
+            <div>
+
+                <h1>
+                    CloudGuard
+                </h1>
+
+                <p>
+                    Cloud Security Posture Management
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="actions">
+
+            <!-- BACK TO DASHBOARD -->
+
+            <a
+                href="/"
+                class="dashboard-btn">
+
+                ← Dashboard
+
+            </a>
+
+
+            <!-- PRINT / SAVE PDF -->
+
+            <button
+                class="print-btn"
+                onclick="window.print()">
+
+                🖨 Print / Save PDF
+
+            </button>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- TITLE -->
+
+    <div class="report-title">
+
+        <h2>
+            Security Report
+        </h2>
+
+        <p>
+            CloudGuard security assessment and findings
+        </p>
+
+    </div>
+
+
+
+    <!-- SUMMARY -->
+
+    <div class="summary-grid">
+
+
+        <div class="summary-card score-card">
+
+            <p>
+                Security Score
+            </p>
+
+            <strong>
+                {{ security_score }}/100
+            </strong>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <p>
+                Critical
+            </p>
+
+            <strong class="critical">
+                {{ critical }}
+            </strong>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <p>
+                High
+            </p>
+
+            <strong class="high">
+                {{ high }}
+            </strong>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <p>
+                Total Findings
+            </p>
+
+            <strong>
+                {{ findings|length }}
+            </strong>
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- SEVERITY SUMMARY -->
+
+    <section class="section">
+
+        <div class="section-header">
+
+            <h2>
+                Severity Summary
+            </h2>
+
+            <p>
+                Distribution of detected security issues
+            </p>
+
+        </div>
+
+
+        <div class="section-body">
+
+            <div class="summary-grid"
+                 style="margin-top:0;">
+
+
+                <div class="summary-card">
+
+                    <p>
+                        Critical
+                    </p>
+
+                    <strong class="critical">
+                        {{ critical }}
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <p>
+                        High
+                    </p>
+
+                    <strong class="high">
+                        {{ high }}
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <p>
+                        Medium
+                    </p>
+
+                    <strong class="medium">
+                        {{ medium }}
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <p>
+                        Low
+                    </p>
+
+                    <strong class="low">
+                        {{ low }}
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- RESOURCES -->
+
+    <section class="section">
+
+        <div class="section-header">
+
+            <h2>
+                Cloud Resources
+            </h2>
+
+            <p>
+                Security status of monitored resources
+            </p>
+
+        </div>
+
+
+        <div class="section-body">
+
+            <div class="resources">
+
+
+                {% for resource in resources %}
+
+                <div class="resource">
+
+                    <div class="resource-name">
+
+                        {{ resource.name }}
+
+                    </div>
+
+
+                    <div class="resource-type">
+
+                        {{ resource.type|upper }}
+
+                    </div>
+
+
+                    {% if resource.status == "SECURE" %}
+
+                    <div class="resource-status secure">
+
+                        ● SECURE
+
+                    </div>
+
+                    {% else %}
+
+                    <div class="resource-status risk">
+
+                        ● AT RISK
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+                {% endfor %}
+
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- FINDINGS -->
+
+    <section class="section">
+
+        <div class="section-header">
+
+            <h2>
+                Security Findings
+            </h2>
+
+            <p>
+                Detailed security findings and remediation recommendations
+            </p>
+
+        </div>
+
+
+        <div class="section-body">
+
+
+            {% for finding in findings %}
+
+            <div class="finding">
+
+
+                <div class="finding-top">
+
+                    <div class="finding-title">
+
+                        {{ finding.issue }}
+
+                    </div>
+
+
+                    {% if finding.severity == "CRITICAL" %}
+
+                    <span class="badge badge-critical">
+                        CRITICAL
+                    </span>
+
+                    {% elif finding.severity == "HIGH" %}
+
+                    <span class="badge badge-high">
+                        HIGH
+                    </span>
+
+                    {% elif finding.severity == "MEDIUM" %}
+
+                    <span class="badge badge-medium">
+                        MEDIUM
+                    </span>
+
+                    {% else %}
+
+                    <span class="badge badge-low">
+                        LOW
+                    </span>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="finding-resource">
+
+                    Resource:
+
+                    <strong>
+                        {{ finding.resource }}
+                    </strong>
+
+                </div>
+
+
+                <div class="finding-description">
+
+                    {{ finding.description }}
+
+                </div>
+
+
+                <div class="recommendation">
+
+                    <strong>
+                        Recommended remediation:
+                    </strong>
+
+                    <br>
+
+                    {{ finding.recommendation }}
+
+                </div>
+
+
+            </div>
+
+            {% endfor %}
+
+
+        </div>
+
+    </section>
+
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        CloudGuard V1.0
+        •
+        Cloud Security Posture Management
+        •
+        Security Assessment Report
+
+    </footer>
+
+
+</div>
+
+
+</body>
+
+</html>
